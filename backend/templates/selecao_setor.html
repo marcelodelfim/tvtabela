@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Selecionar Setor - Design</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; padding-top: 50px; }
+        .card-setor {
+            border: none; border-radius: 20px; transition: 0.3s;
+            text-align: center; padding: 30px; cursor: pointer;
+            text-decoration: none; color: inherit; display: block;
+        }
+        .card-setor:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,0,0,0.1); background: #fff; }
+        .icon-setor { font-size: 3rem; margin-bottom: 15px; display: block; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="text-center mb-5">
+        <a href="/admin" class="btn btn-sm btn-outline-secondary mb-3">← Voltar ao Menu Principal</a>
+        <h2 class="fw-bold">Qual tela você deseja configurar?</h2>
+        <p class="text-muted">Selecione o setor para editar cores, imagens e o modo de exibição.</p>
+    </div>
+
+    <div class="row justify-content-center g-4">
+        {% for setor in setores %}
+        <div class="col-md-3">
+            <a href="/admin/config/{{ setor }}" class="card card-setor shadow-sm">
+                <span class="icon-setor">
+                    {% if setor == 'Açougue' %}🥩{% elif setor == 'Padaria' %}🍞{% else %}🥦{% endif %}
+                </span>
+                <h4 class="fw-bold">{{ setor }}</h4>
+                <small class="text-primary">Editar Design →</small>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoWall - {{ config.nome_setor }}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: {{ config.cor_fundo }};
+            --text-color: {{ config.cor_texto }};
+            --accent-color: {{ config.cor_destaque }};
+            --font-family: 'Oswald', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--text-color);
+            margin: 0; padding: 0; overflow: hidden;
+            height: 100vh; width: 100vw;
+            
+            {% if config.imagem_fundo %}
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
+                              url('{{ url_for('static', filename='uploads/' + config.imagem_fundo) }}');
+            {% else %}
+            background-color: var(--bg-color);
+            {% endif %}
+            
+            background-size: cover;
+            background-position: center;
+        }
+
+        .wrapper {
+            display: grid;
+            grid-template-rows: 120px 1fr;
+            height: 100vh;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0,0,0,0.3);
+            border-bottom: 8px solid var(--accent-color);
+        }
+
+        .titulo-setor {
+            font-size: 4.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+        }
+
+        /* --- LOGICA DE GRID DINAMICO BASEADO NO MODO --- */
+        .main-content {
+            display: grid;
+            gap: 30px;
+            padding: 30px;
+            height: calc(100vh - 120px);
+            align-items: stretch;
+        }
+
+        /* Layouts de Grid */
+        .layout-tabela_pura { grid-template-columns: 1fr; }
+        .layout-tabela { grid-template-columns: {% if promocoes %} 1fr 500px {% else %} 1fr {% endif %}; }
+        .layout-tabela_dupla { grid-template-columns: 1fr 400px; } /* Coluna da direita um pouco menor para o empilhamento */
+        .layout-promo1 { grid-template-columns: 1fr; }
+        .layout-promo2 { grid-template-columns: 1fr 1fr; }
+
+        /* --- ESTILO DA TABELA (COM BLUR) --- */
+        .tabela-container {
+            background-color: rgba(0,0,0,0.7);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            height: 100%;
+        }
+
+        .grid-header, .grid-row {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            padding: 15px 20px;
+        }
+
+        .grid-header {
+            font-size: 2rem;
+            color: var(--accent-color);
+            border-bottom: 4px solid var(--accent-color);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .grid-row {
+            font-size: 2.8rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-transform: uppercase;
+        }
+
+        .item-preco {
+            color: var(--accent-color);
+            text-align: right;
+            font-weight: 900;
+        }
+
+        /* --- ESTILO DO CARD DE OFERTA --- */
+        .card-oferta {
+            background-color: #fff;
+            border-radius: 30px;
+            border: 8px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            height: 100%;
+        }
+
+        .badge-oferta {
+            background-color: var(--accent-color);
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 900;
+            padding: 10px 60px;
+            border-radius: 50px;
+            position: absolute;
+            top: -40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        .oferta-nome {
+            color: #333;
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .oferta-img {
+            width: 90%;
+            max-height: 400px;
+            object-fit: contain;
+            margin: 20px 0;
+            background-color: #fff;
+            border-radius: 20px;
+            border: 5px solid rgba(0,0,0,0.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), 0 5px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease-out;
+            transform: rotate(-2deg);
+        }
+
+        .card-oferta:hover .oferta-img {
+            transform: rotate(0deg) scale(1.03);
+        }
+
+        .oferta-preco-box {
+            color: var(--accent-color);
+            font-size: 10rem;
+            font-weight: 900;
+            line-height: 0.8;
+            margin-top: auto;
+        }
+
+        .cifrao { font-size: 3.5rem; vertical-align: top; margin-right: 5px; }
+        .unidade { font-size: 2.5rem; color: #333; }
+
+        /* Ajustes específicos para layouts */
+        .layout-promo1 .card-oferta { padding: 60px; }
+        .layout-promo1 .oferta-nome { font-size: 6rem; }
+        .layout-promo1 .oferta-preco-box { font-size: 16rem; }
+        .layout-promo1 .oferta-img { max-height: 500px; width: auto; }
+
+        /* Estilo para Tabela + 2 Promos Verticais */
+        .coluna-promos-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+        .coluna-promos-vertical .card-oferta {
+            padding: 15px;
+        }
+        .coluna-promos-vertical .oferta-nome { font-size: 2rem; margin-top: 10px; }
+        .coluna-promos-vertical .oferta-preco-box { font-size: 5.5rem; }
+        .coluna-promos-vertical .oferta-img { max-height: 160px; margin: 10px 0; }
+        .coluna-promos-vertical .badge-oferta { font-size: 1.5rem; padding: 5px 30px; top: -20px; }
+
+    </style>
+    <meta http-equiv="refresh" content="30">
+</head>
+<body>
+
+    <div class="wrapper">
+        <header>
+            <div class="titulo-setor">{{ config.nome_setor }}</div>
+        </header>
+
+        <main class="main-content layout-{{ config.modo_exibicao }}">
+            
+            {% if config.modo_exibicao == 'tabela_pura' %}
+                <div class="tabela-container">
+                    <div class="grid-header">
+                        <span>Produto</span><span style="text-align: right;">Preço</span>
+                    </div>
+                    {% for item in itens_mgv %}
+                    <div class="grid-row"><span>{{ item.nome }}</span><span class="item-preco">R$ {{ item.preco }}</span></div>
+                    {% endfor %}
+                </div>
+
+            {% elif config.modo_exibicao == 'tabela' %}
+                <div class="tabela-container">
+                    <div class="grid-header">
+                        <span>Produto</span><span style="text-align: right;">Preço</span>
+                    </div>
+                    {% for item in itens_mgv %}
+                    <div class="grid-row"><span>{{ item.nome }}</span><span class="item-preco">R$ {{ item.preco }}</span></div>
+                    {% endfor %}
+                </div>
+                {% if promocoes %}
+                <div class="card-oferta">
+                    <div class="badge-oferta">OFERTA</div>
+                    <div class="oferta-nome">{{ promocoes[-1].nome_produto }}</div>
+                    <img src="{{ url_for('static', filename='uploads/' + promocoes[-1].imagem) if promocoes[-1].imagem else 'https://via.placeholder.com/500x400.png?text=SEM+FOTO' }}" class="oferta-img">
+                    <div class="oferta-preco-box"><span class="cifrao">R$</span>{{ promocoes[-1].preco }}<span class="unidade">kg</span></div>
+                </div>
+                {% endif %}
+
+            {% elif config.modo_exibicao == 'tabela_dupla' %}
+                <div class="tabela-container">
+                    <div class="grid-header">
+                        <span>Produto</span><span style="text-align: right;">Preço</span>
+                    </div>
+                    {% for item in itens_mgv %}<div class="grid-row"><span>{{ item.nome }}</span><span class="item-preco">R$ {{ item.preco }}</span></div>{% endfor %}
+                </div>
+                <div class="coluna-promos-vertical">
+                    {% for promo in promocoes[-2:] %}
+                    <div class="card-oferta">
+                        <div class="badge-oferta">OFERTA</div>
+                        <div class="oferta-nome">{{ promo.nome_produto }}</div>
+                        <img src="{{ url_for('static', filename='uploads/' + promo.imagem) if promo.imagem else 'https://via.placeholder.com/500x400.png?text=SEM+FOTO' }}" class="oferta-img">
+                        <div class="oferta-preco-box"><span class="cifrao">R$</span>{{ promo.preco }}<span class="unidade">kg</span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            {% elif config.modo_exibicao == 'promo1' and promocoes %}
+                <div class="card-oferta">
+                    <div class="badge-oferta">OFERTA DO DIA</div>
+                    <div class="oferta-nome">{{ promocoes[-1].nome_produto }}</div>
+                    <img src="{{ url_for('static', filename='uploads/' + promocoes[-1].imagem) if promocoes[-1].imagem else 'https://via.placeholder.com/500x400.png?text=SEM+FOTO' }}" class="oferta-img">
+                    <div class="oferta-preco-box">
+                        <span class="cifrao">R$</span>{{ promocoes[-1].preco }}<span class="unidade">kg</span>
+                    </div>
+                </div>
+
+            {% elif config.modo_exibicao == 'promo2' and promocoes %}
+                {% for promo in promocoes[-2:] %}
+                <div class="card-oferta">
+                    <div class="badge-oferta">OFERTA</div>
+                    <div class="oferta-nome">{{ promo.nome_produto }}</div>
+                    <img src="{{ url_for('static', filename='uploads/' + promo.imagem) if promo.imagem else 'https://via.placeholder.com/500x400.png?text=SEM+FOTO' }}" class="oferta-img">
+                    <div class="oferta-preco-box">
+                        <span class="cifrao">R$</span>{{ promo.preco }}<span class="unidade">kg</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+        </main>
+    </div>
+
+</body>
+</html>

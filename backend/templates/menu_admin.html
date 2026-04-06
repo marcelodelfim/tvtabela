@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Central - Sistema VideoWall</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .card-menu {
+            border: none;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .card-menu:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+        .icon-box {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #a00;
+        }
+        .card-title { font-weight: 700; color: #333; }
+        .card-text { color: #777; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Painel de Controle do Mercado</h1>
+        <p class="text-muted">Selecione o módulo que deseja gerenciar abaixo.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <a href="/cadastro-promo" class="card card-menu">
+                <div class="icon-box"><i class="bi bi-megaphone-fill"></i></div>
+                <h3 class="card-title">Lançar Ofertas</h3>
+                <p class="card-text">Cadastre fotos e preços para o card de destaque (Manual).</p>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="/admin/aparencia" class="card card-menu">
+                <div class="icon-box"><i class="bi bi-palette-fill"></i></div>
+                <h3 class="card-title">Aparência das Telas</h3>
+                <p class="card-text">Edite cores, fontes e imagens de fundo de cada setor.</p>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card card-menu" data-bs-toggle="modal" data-bs-target="#modalTelas">
+                <div class="icon-box"><i class="bi bi-tv-fill"></i></div>
+                <h3 class="card-title">Abrir VideoWall</h3>
+                <p class="card-text">Escolha qual setor abrir em tela cheia nesta máquina.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalTelas" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Selecione o Setor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="d-grid gap-2">
+                    <a href="/tela/Açougue" target="_blank" class="btn btn-outline-danger btn-lg">TELA AÇOUGUE</a>
+                    <a href="/tela/Padaria" target="_blank" class="btn btn-outline-danger btn-lg">TELA PADARIA</a>
+                    <a href="/tela/Hortifruti" target="_blank" class="btn btn-outline-danger btn-lg">TELA HORTIFRUTI</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
