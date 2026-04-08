@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoWall - {{ config.nome_setor }} (Tabela)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
+    
+<style>
+    :root {
+        --bg-color: {{ config.cor_fundo }};
+        --text-color: {{ config.cor_texto }};
+        --accent-color: {{ config.cor_destaque }};
+        --font-family: 'Oswald', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: var(--font-family);
+        color: var(--text-color);
+        margin: 0; padding: 0; overflow: hidden;
+        height: 100vh; width: 100vw;
+        {% if config.imagem_fundo %}
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
+                          url('{{ url_for('static', filename='uploads/' + config.imagem_fundo) }}');
+        {% else %}
+        background-color: var(--bg-color);
+        {% endif %}
+        background-size: cover;
+        background-position: center;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    header {
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0,0,0,0.3);
+        border-bottom: 6px solid var(--accent-color);
+        flex-shrink: 0;
+    }
+
+    .titulo-setor {
+        font-size: clamp(2.5rem, 5vw, 5rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        color: #fff;
+    }
+
+    /* GRID DA TABELA E LATERAIS */
+    .main-tabela {
+        display: grid;
+        gap: 20px;
+        padding: 20px;
+        flex: 1;
+        min-height: 0; 
+    }
+
+    .layout-tabela_pura { grid-template-columns: 1fr; }
+    .layout-tabela { grid-template-columns: 1.2fr 0.8fr; }
+    .layout-tabela_dupla { grid-template-columns: 1.2fr 0.8fr; }
+
+    .tabela-container {
+        background-color: rgba(0,0,0,0.7);
+        border-radius: 20px;
+        padding: 15px;
+        border: 2px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* ==== NOVO GRID DE 3 COLUNAS ==== */
+    .grid-header, .grid-row {
+        display: grid;
+        /* Coluna 1 (Código): Mínimo 60px, máximo 12% do espaço
+           Coluna 2 (Nome): 1fr (Pega todo o espaço restante)
+           Coluna 3 (Preço): auto (Tamanho do preço) */
+        grid-template-columns: minmax(60px, 12%) 1fr auto; 
+        padding: 0.5vh 1vw;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .grid-header {
+        font-size: 1.6rem;
+        color: var(--accent-color);
+        border-bottom: 4px solid var(--accent-color);
+        font-weight: 700;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+    }
+
+    .grid-row {
+        font-size: clamp(1.2rem, 2vw, 2.3rem);
+        font-weight: 700;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    /* Código do produto um pouco mais discreto */
+    .item-codigo {
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+    /* Previne que o nome quebre linha */
+    .grid-row span:nth-child(2) {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-preco {
+        color: var(--accent-color);
+        text-align: right;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    /* ESTILOS DOS CARDS LATERAIS */
+    .coluna-promos-vertical {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .card-oferta {
+        background-color: #fff;
+        border-radius: 25px;
+        border: 6px solid var(--accent-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+        flex: 1; 
+        min-height: 0; 
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .badge-oferta {
+        background-color: var(--accent-color);
+        color: #fff;
+        width: 100%;
+        text-align: center;
+        font-size: clamp(1rem, 1.5vw, 1.6rem);
+        font-weight: 900;
+        padding: 6px 0;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .oferta-nome {
+        color: #333;
+        font-size: clamp(1.4rem, 2.5vw, 2.8rem);
+        font-weight: 900;
+        text-align: center;
+        padding: 5px 10px;
+        line-height: 1.1;
+        text-transform: uppercase;
+        margin-top: 5px;
+        flex-shrink: 0;
+    }
+
+    .oferta-img-box {
+        flex: 1;
+        min-height: 0; 
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    .oferta-img {
+        max-width: 95%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .oferta-preco-box {
+        margin-top: auto; 
+        color: var(--accent-color);
+        font-size: clamp(3rem, 7vw, 8rem);
+        font-weight: 900;
+        line-height: 0.9;
+        width: 100%;
+        text-align: center;
+        background-color: #fff;
+        padding: 10px 0;
+        flex-shrink: 0;
+    }
+
+    .cifrao { font-size: 0.35em; vertical-align: top; }
+    .unidade { font-size: 0.25em; color: #333; }
+
+</style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <header>
+            <div class="titulo-setor">{{ config.nome_setor }}</div>
+        </header>
+
+        <main class="main-tabela layout-{{ config.modo_exibicao }}" id="main-display">
+        </main>
+    </div>
+
+<script>
+    const todosProdutos = {{ itens_mgv | tojson }};
+    const todasPromos = {{ promocoes | tojson }};
+    const tempoTabela = {{ config.tempo_tabela or 15 }} * 1000;
+    const tempoPromo = {{ config.tempo_promo or 10 }} * 1000;
+    const modoLayout = "{{ config.modo_exibicao }}".toLowerCase();
+
+    let paginaAtual = 0;
+    let indexPromo = 0;
+    let itensPorPagina = 10;
+
+    function obterPromosAtivas() {
+        const diasSemanas = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+        const hoje = diasSemanas[new Date().getDay()];
+        return todasPromos.filter(p => p.ativo === true && p[hoje] === true);
+    }
+    const promosHoje = obterPromosAtivas();
+
+    function renderCard(p, label) {
+        const img = p.imagem ? `/static/uploads/${p.imagem}` : '';
+        return `
+            <div class="card-oferta">
+                <div class="badge-oferta">${label}</div>
+                <div class="oferta-nome">${p.nome_produto}</div>
+                <div class="oferta-img-box">
+                    <img src="${img}" class="oferta-img" onerror="this.style.display='none'">
+                </div>
+                <div class="oferta-preco-box">
+                    <span class="cifrao">R$</span>${p.preco}<span class="unidade">kg</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function medirTela() {
+        const main = document.getElementById('main-display');
+        
+        // Simulação invisível agora com 3 espaços de coluna
+        let htmlFake = `
+            <div class="tabela-container" id="fake-container" style="visibility: hidden;">
+                <div class="grid-header" id="fake-header"><span>C</span><span>T</span><span>0</span></div>
+                <div class="grid-row" id="fake-row"><span>C</span><span>T</span><span>0</span></div>
+            </div>
+        `;
+        
+        if (modoLayout.includes('dupla')) {
+            htmlFake += `<div class="coluna-promos-vertical" style="visibility:hidden;"><div class="card-oferta"></div><div class="card-oferta"></div></div>`;
+        } else if (modoLayout.includes('pura')) {
+        } else {
+            htmlFake += `<div class="card-oferta" style="visibility:hidden;"></div>`;
+        }
+
+        main.innerHTML = htmlFake;
+
+        const container = document.getElementById('fake-container');
+        const header = document.getElementById('fake-header');
+        const row = document.getElementById('fake-row');
+
+        if(container && header && row) {
+            const estiloCont = window.getComputedStyle(container);
+            const padY = parseFloat(estiloCont.paddingTop) + parseFloat(estiloCont.paddingBottom);
+            const margemHeader = parseFloat(window.getComputedStyle(header).marginBottom);
+            
+            const alturaLivre = container.clientHeight - padY - header.offsetHeight - margemHeader;
+            itensPorPagina = Math.max(1, Math.floor((alturaLivre - 5) / row.offsetHeight));
+        }
+        
+        paginaAtual = 0;
+    }
+
+    function desenharTela() {
+        const main = document.getElementById('main-display');
+
+        const totalPaginas = Math.ceil(todosProdutos.length / itensPorPagina);
+        if(paginaAtual >= totalPaginas) paginaAtual = 0;
+
+        const inicio = paginaAtual * itensPorPagina;
+        const itensVisiveis = todosProdutos.slice(inicio, inicio + itensPorPagina);
+
+        // NOVA TABELA AGORA COM 3 COLUNAS
+        const tabelaHtml = `
+            <div class="tabela-container">
+                <div class="grid-header">
+                    <span>Cód.</span>
+                    <span>Produto</span>
+                    <span style="text-align: right;">Preço</span>
+                </div>
+                ${itensVisiveis.map(item => `
+                    <div class="grid-row">
+                        <span class="item-codigo">${item.codigo || ''}</span>
+                        <span>${item.nome}</span>
+                        <span class="item-preco">R$ ${item.preco}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        let html = '';
+
+        if (modoLayout.includes('pura')) {
+            html = tabelaHtml;
+        } else if (modoLayout.includes('dupla')) {
+            const p1 = promosHoje[indexPromo % promosHoje.length];
+            const p2 = promosHoje[(indexPromo + 1) % promosHoje.length];
+            html = tabelaHtml + `
+                <div class="coluna-promos-vertical">
+                    ${p1 ? renderCard(p1, 'OFERTA') : ''}
+                    ${p2 ? renderCard(p2, 'OFERTA') : ''}
+                </div>
+            `;
+        } else {
+            const p = promosHoje[indexPromo % promosHoje.length];
+            html = tabelaHtml + (p ? renderCard(p, 'OFERTA') : '');
+        }
+
+        main.innerHTML = html;
+    }
+
+    medirTela();
+    desenharTela();
+
+    setInterval(() => {
+        paginaAtual++;
+        desenharTela();
+    }, tempoTabela);
+
+    setInterval(() => {
+        if (promosHoje.length > 1) {
+            let pulo = (modoLayout.includes('dupla') && promosHoje.length > 1) ? 2 : 1;
+            indexPromo = (indexPromo + pulo) % promosHoje.length;
+            desenharTela();
+        }
+    }, tempoPromo);
+
+    window.addEventListener('resize', () => {
+        medirTela();
+        desenharTela();
+    });
+
+    // ==========================================
+        // SISTEMA DE ATUALIZAÇÃO SILENCIOSA (ESPIÃO)
+        // ==========================================
+        let versaoAtual = null;
+
+        setInterval(() => {
+            fetch('/api/versao')
+                .then(response => response.json())
+                .then(data => {
+                    if (versaoAtual === null) {
+                        // Primeira vez que carrega a tela, apenas grava a versão atual
+                        versaoAtual = data.versao;
+                    } else if (data.versao !== versaoAtual) {
+                        // Opa! O painel admin mudou a versão. A TV precisa recarregar!
+                        window.location.reload();
+                    }
+                })
+                .catch(err => console.log("Aguardando conexão com o servidor..."));
+        }, 10000); // Checa de 10 em 10 segundos
+
+</script>
+</body>
+</html>

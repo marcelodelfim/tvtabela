@@ -94,48 +94,61 @@
                     <hr>
                     <div class="text-end">
                         
-<div class="mb-4 border-top pt-4">
-    <h5 class="fw-bold mb-3"><i class="bi bi-layout-split"></i> Como a TV deve se comportar?</h5>
-    <div class="row g-3">
-        <div class="col">
-            <input type="radio" class="btn-check" name="modo_exibicao" id="modo_pura" value="tabela_pura" {% if config.modo_exibicao == 'tabela_pura' %}checked{% endif %}>
-            <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_pura">
-                <i class="bi bi-distribute-horizontal fs-2"></i>
-                <small class="fw-bold">Apenas Tabela</small>
-            </label>
-        </div>
+                        <div class="mb-4 border-top pt-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-layout-split"></i> Como a TV deve se comportar?</h5>
+                            <div class="row g-3">
+                                <div class="col">
+                                    <input type="radio" class="btn-check" name="modo_exibicao" id="modo_pura" value="tabela_pura" {% if config.modo_exibicao == 'tabela_pura' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_pura">
+                                        <i class="bi bi-distribute-horizontal fs-2"></i>
+                                        <small class="fw-bold">Apenas Tabela</small>
+                                    </label>
+                                </div>
 
-        <div class="col">
-            <input type="radio" class="btn-check" name="modo_exibicao" id="modo_tabela" value="tabela" {% if config.modo_exibicao == 'tabela' %}checked{% endif %}>
-            <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_tabela">
-                <i class="bi bi-layout-sidebar-reverse fs-2"></i>
-                <small class="fw-bold">Tabela + 1 Promo</small>
-            </label>
-        </div>
+                                <div class="col">
+                                    <input type="radio" class="btn-check" name="modo_exibicao" id="modo_tabela" value="tabela" {% if config.modo_exibicao == 'tabela' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_tabela">
+                                        <i class="bi bi-layout-sidebar-reverse fs-2"></i>
+                                        <small class="fw-bold">Tabela + 1 Promo</small>
+                                    </label>
+                                </div>
 
-        <div class="col">
-            <input type="radio" class="btn-check" name="modo_exibicao" id="modo_tabela_dupla" value="tabela_dupla" {% if config.modo_exibicao == 'tabela_dupla' %}checked{% endif %}>
-            <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_tabela_dupla">
-                <i class="bi bi-layout-three-columns fs-2"></i>
-                <small class="fw-bold">Tabela + 2 Promos</small>
-            </label>
-        </div>
+                                <div class="col">
+                                    <input type="radio" class="btn-check" name="modo_exibicao" id="modo_tabela_dupla" value="tabela_dupla" {% if config.modo_exibicao == 'tabela_dupla' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_tabela_dupla">
+                                        <i class="bi bi-layout-three-columns fs-2"></i>
+                                        <small class="fw-bold">Tabela + 2 Promos</small>
+                                    </label>
+                                </div>
 
-        <div class="col">
-            <input type="radio" class="btn-check" name="modo_exibicao" id="modo_promo1" value="promo1" {% if config.modo_exibicao == 'promo1' %}checked{% endif %}>
-            <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_promo1">
-                <i class="bi bi-fullscreen fs-2"></i>
-                <small class="fw-bold">1 Promo Gigante</small>
-            </label>
-        </div>
+                                <div class="col">
+                                    <input type="radio" class="btn-check" name="modo_exibicao" id="modo_promo1" value="promo1" {% if config.modo_exibicao == 'promo1' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_promo1">
+                                        <i class="bi bi-fullscreen fs-2"></i>
+                                        <small class="fw-bold">1 Promo Gigante</small>
+                                    </label>
+                                </div>
 
-        <div class="col">
-            <input type="radio" class="btn-check" name="modo_exibicao" id="modo_promo2" value="promo2" {% if config.modo_exibicao == 'promo2' %}checked{% endif %}>
-            <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_promo2">
-                <i class="bi bi-grid-1x2 fs-2"></i>
-                <small class="fw-bold">2 Promos Lado a Lado</small>
-            </label>
-        </div>
+                                <div class="col">
+                                    <input type="radio" class="btn-check" name="modo_exibicao" id="modo_promo2" value="promo2" {% if config.modo_exibicao == 'promo2' %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary w-100 p-2 d-flex flex-column align-items-center" for="modo_promo2">
+                                        <i class="bi bi-grid-1x2 fs-2"></i>
+                                        <small class="fw-bold">2 Promos Lado a Lado</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+<div class="row mt-4 border-top pt-3">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold"><i class="bi bi-hourglass-split"></i> Tempo da Tabela (segundos)</label>
+        <input type="number" name="tempo_tabela" class="form-control" value="{{ config.tempo_tabela }}" min="5">
+        <small class="text-muted">Tempo que cada grupo de produtos fica na tela.</small>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold"><i class="bi bi-play-circle"></i> Tempo da Promoção (segundos)</label>
+        <input type="number" name="tempo_promo" class="form-control" value="{{ config.tempo_promo }}" min="3">
+        <small class="text-muted">Velocidade do rodízio das ofertas laterais.</small>
     </div>
 </div>
 

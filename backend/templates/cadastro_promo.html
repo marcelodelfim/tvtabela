@@ -33,6 +33,19 @@
                             <label class="form-label fw-bold">Preço</label>
                             <input type="text" name="preco" class="form-control form-control-lg" placeholder="00,00" required>
                         </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">Dias de Exibição:</label>
+                            <div class="d-flex justify-content-between border p-2 rounded bg-white">
+                                <div class="form-check"><input class="form-check-input" type="checkbox" name="seg" checked> Seg</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" name="ter" checked> Ter</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" name="qua" checked> Qua</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" name="qui" checked> Qui</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" name="sex" checked> Sex</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" name="sab" checked> Sáb</div>
+                                <div class="form-check"><input class="form-check-input" type="checkbox" name="dom" checked> Dom</div>
+                            </div>
+                        </div>
+                        
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-bold">Enviar para qual Tela?</label>
                             <select name="setor" class="form-select form-select-lg" required>
@@ -69,9 +82,66 @@
                                 <td class="text-danger fw-bold">R$ {{ p.preco }}</td>
                                 <td><span class="badge bg-secondary badge-setor">{{ p.setor }}</span></td>
                                 <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editModal{{ p.id }}">Editar</button>
+                                    
                                     <a href="/deletar-promo/{{ p.id }}" class="btn btn-sm btn-outline-danger">Remover</a>
                                 </td>
                             </tr>
+
+                            <div class="modal fade" id="editModal{{ p.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-dark text-white">
+                                            <h5 class="modal-title">Editar Oferta: {{ p.nome_produto }}</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="/admin/promo/editar/{{ p.id }}" method="POST" enctype="multipart/form-data">
+                                            <div class="modal-body text-start">
+                                                <div class="row">
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label fw-bold">Nome do Produto</label>
+                                                        <input type="text" name="nome" class="form-control form-control-lg" value="{{ p.nome_produto }}" required>
+                                                    </div>
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label fw-bold">Preço</label>
+                                                        <input type="text" name="preco" class="form-control form-control-lg" value="{{ p.preco }}" required>
+                                                    </div>
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label fw-bold">Dias de Exibição:</label>
+                                                        <div class="d-flex justify-content-between border p-2 rounded bg-light">
+                                                            <div class="form-check"><input class="form-check-input" type="checkbox" name="seg" {% if p.seg %}checked{% endif %}> Seg</div>
+                                                            <div class="form-check"><input class="form-check-input" type="checkbox" name="ter" {% if p.ter %}checked{% endif %}> Ter</div>
+                                                            <div class="form-check"><input class="form-check-input" type="checkbox" name="qua" {% if p.qua %}checked{% endif %}> Qua</div>
+                                                            <div class="form-check"><input class="form-check-input" type="checkbox" name="qui" {% if p.qui %}checked{% endif %}> Qui</div>
+                                                            <div class="form-check"><input class="form-check-input" type="checkbox" name="sex" {% if p.sex %}checked{% endif %}> Sex</div>
+                                                            <div class="form-check"><input class="form-check-input" type="checkbox" name="sab" {% if p.sab %}checked{% endif %}> Sáb</div>
+                                                            <div class="form-check"><input class="form-check-input" type="checkbox" name="dom" {% if p.dom %}checked{% endif %}> Dom</div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label fw-bold">Enviar para qual Tela?</label>
+                                                        <select name="setor" class="form-select form-select-lg" required>
+                                                            <option value="Açougue" {% if p.setor == 'Açougue' %}selected{% endif %}>TV Açougue</option>
+                                                            <option value="Padaria" {% if p.setor == 'Padaria' %}selected{% endif %}>TV Padaria</option>
+                                                            <option value="Hortifruti" {% if p.setor == 'Hortifruti' %}selected{% endif %}>TV Hortifruti</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label fw-bold">Nova Foto (Opcional)</label>
+                                                        <input type="file" name="foto_produto" class="form-control form-control-lg">
+                                                        <small class="text-muted">Deixe em branco para manter a foto atual.</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer border-top-0">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-success">Salvar Alterações</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                             {% else %}
                             <tr>
                                 <td colspan="4" class="text-center py-4 text-muted">Nenhuma oferta manual ativa.</td>

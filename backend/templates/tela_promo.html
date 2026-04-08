@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoWall - {{ config.nome_setor }} (Apenas Promoções)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&display=swap" rel="stylesheet">
+    
+<style>
+    :root {
+        --bg-color: {{ config.cor_fundo }};
+        --text-color: {{ config.cor_texto }};
+        --accent-color: {{ config.cor_destaque }};
+        --font-family: 'Oswald', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: var(--font-family);
+        color: var(--text-color);
+        margin: 0; padding: 0; overflow: hidden;
+        height: 100vh; width: 100vw;
+        {% if config.imagem_fundo %}
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), 
+                          url('{{ url_for('static', filename='uploads/' + config.imagem_fundo) }}');
+        {% else %}
+        background-color: var(--bg-color);
+        {% endif %}
+        background-size: cover;
+        background-position: center;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    header {
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0,0,0,0.3);
+        border-bottom: 6px solid var(--accent-color);
+        flex-shrink: 0;
+    }
+
+    .titulo-setor {
+        font-size: clamp(2.5rem, 5vw, 5rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        color: #fff;
+    }
+
+    /* CONTAINER PRINCIPAL FLEXBOX */
+    .main-promo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6vw; /* Espaço entre cards no modo duplo */
+        padding: 20px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    /* ESTILOS BASE DOS CARDS */
+    .card-oferta {
+        background-color: #fff;
+        border-radius: 25px;
+        border: 6px solid var(--accent-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+        overflow: hidden;
+        height: 80vh; 
+        max-height: 900px;
+        flex: none; 
+    }
+
+    /* Tamanho se estiver SOZINHO na tela (Mais imponente) */
+    .card-unica {
+        width: 48vw; 
+        max-width: 800px;
+    }
+
+    /* Tamanho se estiverem DOIS na tela */
+    .card-dupla {
+        width: 38vw; 
+        max-width: 600px;
+    }
+
+    .badge-oferta {
+        background-color: var(--accent-color);
+        color: #fff;
+        width: 100%;
+        text-align: center;
+        font-size: clamp(1.2rem, 1.8vw, 2rem);
+        font-weight: 900;
+        padding: 8px 0;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+
+    .oferta-nome {
+        color: #333;
+        font-size: clamp(1.6rem, 3vw, 3.5rem);
+        font-weight: 900;
+        text-align: center;
+        padding: 10px 10px 0 10px;
+        line-height: 1.1;
+        text-transform: uppercase;
+        margin-top: 5px;
+        flex-shrink: 0;
+    }
+
+    .oferta-img-box {
+        flex: 1;
+        min-height: 0; 
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .oferta-img {
+        max-width: 90%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .oferta-preco-box {
+        margin-top: auto; 
+        color: var(--accent-color);
+        font-size: clamp(4rem, 8vw, 11rem);
+        font-weight: 900;
+        line-height: 0.9;
+        width: 100%;
+        text-align: center;
+        background-color: #fff;
+        padding: 15px 0;
+        flex-shrink: 0;
+    }
+
+    .cifrao { font-size: 0.35em; vertical-align: top; }
+    .unidade { font-size: 0.25em; color: #333; }
+
+</style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <header>
+            <div class="titulo-setor">{{ config.nome_setor }}</div>
+        </header>
+
+        <main class="main-promo" id="main-display">
+            </main>
+    </div>
+
+<script>
+    const todasPromos = {{ promocoes | tojson }};
+    const tempoPromo = {{ config.tempo_promo or 10 }} * 1000;
+    const modoLayout = "{{ config.modo_exibicao }}".toLowerCase(); // Converte para minúsculo para evitar erro de digitação
+
+    let indexPromo = 0;
+
+    // Filtra para pegar apenas as ativas no dia atual
+    function obterPromosAtivas() {
+        const diasSemanas = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+        const hoje = diasSemanas[new Date().getDay()];
+        return todasPromos.filter(p => p.ativo === true && p[hoje] === true);
+    }
+    const promosHoje = obterPromosAtivas();
+    
+    // LINHA DE TESTE: Mostra um alerta na tela com a contagem de produtos válidos para hoje
+    console.log("Modo selecionado:", modoLayout);
+    console.log("Total de promos cadastradas:", todasPromos.length);
+    console.log("Promos válidas para HOJE:", promosHoje.length);
+
+    // Adicionei um parâmetro "tamanhoClass" para o card saber se fica largo ou estreito
+    function renderCard(p, label, tamanhoClass) {
+        const img = p.imagem ? `/static/uploads/${p.imagem}` : '';
+        return `
+            <div class="card-oferta ${tamanhoClass}">
+                <div class="badge-oferta">${label}</div>
+                <div class="oferta-nome">${p.nome_produto}</div>
+                <div class="oferta-img-box">
+                    <img src="${img}" class="oferta-img" onerror="this.style.display='none'">
+                </div>
+                <div class="oferta-preco-box">
+                    <span class="cifrao">R$</span>${p.preco}<span class="unidade">kg</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderizarLayout() {
+            let html = '';
+            
+            // AGORA SIM: Verifica se tem a palavra "dupla" OU o número "2"
+            const ehModoDuplo = modoLayout.includes('dupla') || modoLayout.includes('2');
+            
+            // Só renderiza dois se for modo duplo E tiver pelo menos 2 promoções ativas cadastradas!
+            if (ehModoDuplo && promosHoje.length > 1) {
+                const p1 = promosHoje[indexPromo % promosHoje.length];
+                const p2 = promosHoje[(indexPromo + 1) % promosHoje.length];
+                // Renderiza 2 cards com o CSS 'card-dupla' (mais estreitos)
+                html = renderCard(p1, 'OFERTA', 'card-dupla') + renderCard(p2, 'OFERTA', 'card-dupla');
+            } else {
+                // Renderiza 1 card com o CSS 'card-unica' (mais largo e imponente)
+                const p = promosHoje[indexPromo % promosHoje.length];
+                html = p ? renderCard(p, 'OFERTA', 'card-unica') : '';
+            }
+            
+            document.getElementById('main-display').innerHTML = html;
+        }
+
+        // Loop para trocar as promoções
+        setInterval(() => {
+            if (promosHoje.length > 1) {
+                const ehModoDuplo = modoLayout.includes('dupla') || modoLayout.includes('2');
+                // Se for modo duplo com várias promos, pula de 2 em 2. Senão pula 1.
+                let pulo = (ehModoDuplo && promosHoje.length > 1) ? 2 : 1;
+                indexPromo = (indexPromo + pulo) % promosHoje.length;
+                renderizarLayout();
+            }
+        }, tempoPromo);
+
+    window.addEventListener('resize', renderizarLayout);
+    renderizarLayout();
+
+    // ==========================================
+    // SISTEMA DE ATUALIZAÇÃO SILENCIOSA (ESPIÃO)
+    // ==========================================
+    let versaoAtual = null;
+
+    setInterval(() => {
+        // Adicionamos um timestamp (?t=...) para garantir que o navegador não use o cache
+        fetch('/api/versao?t=' + Date.now())
+            .then(response => response.json())
+            .then(data => {
+                if (versaoAtual === null) {
+                    versaoAtual = data.versao;
+                    console.log("Monitoramento iniciado. Versão atual:", versaoAtual);
+                } else if (data.versao !== versaoAtual) {
+                    console.log("Mudança detectada! De:", versaoAtual, "Para:", data.versao);
+                    window.location.reload();
+                }
+            })
+            .catch(err => console.log("Servidor offline ou erro de rede."));
+    }, 5000); // Reduzi para 5 segundos para você testar mais rápido
+
+</script>
+</body>
+</html>
